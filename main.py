@@ -1,7 +1,9 @@
+# This project's readme file on github: https://github.com/RonYanku/database-python-GAE/blob/master/README.md
+# contains an explanation of the logic in this database, and some color on the four Models used.
+
 import webapp2
 
 from google.appengine.ext import ndb
-
 
 ####################################    helper functions    ##########################################
 
@@ -32,24 +34,20 @@ def fixSettingOrder(modelName):
         return newSeqId                 
 
 ####################################    models    ##################################################
+# More color on the models can be found at 
+# https://github.com/RonYanku/database-python-GAE/blob/master/README.md
 
 # This model contains the variables in the db
 class Item(ndb.Model):
-  name = ndb.StringProperty()
-  value = ndb.StringProperty()
+    name = ndb.StringProperty()
+    value = ndb.StringProperty()
   
 # this model contains the values that have at least 1 occurence in the db  
 class ValueOccurence(ndb.Model):
-  value = ndb.StringProperty()
-  occurence = ndb.IntegerProperty() 
+    value = ndb.StringProperty()
+    occurence = ndb.IntegerProperty() 
 
 # This model represents the history logs of the set/unset commands.
-# We know whether a request is a set or an unset request by the value property.
-# Only one entity's isLastRequest would be set to true at any given time, 
-# it represents the the most recent one.
-# priorValue points to the last value the entity with this name has had,
-# before this last set/unset request.
-# SeqId would help us keep these logs in order.
 class SettingHistory(ndb.Model):
     seqId = ndb.IntegerProperty()
     name = ndb.StringProperty()
@@ -57,9 +55,7 @@ class SettingHistory(ndb.Model):
     priorValue = ndb.StringProperty()
     isLastRequest = ndb.BooleanProperty()
 
-# This class entities would be set/unset commands that were undone, they would
-# leave the SettingHistory model and enter this one, when trying to redo, we would
-# check to see whether this model has entities in it
+# This class entities would be set/unset commands that were undone
 class PotentialRedos(ndb.Model):
     seqId = ndb.IntegerProperty()
     name = ndb.StringProperty()
