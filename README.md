@@ -8,7 +8,8 @@ The noSQL database used was Datasore. in order to make all data persistent the d
 3. **SettingHistory(seqId,name,value,priorValue,isLastRequest)** - This model represents the history logs of the   
    set/unset commands. We know whether a request is a set or an unset request by the value property, if value='None'  
    then it is an unset command, otherwise it's a set command.  
-   as for the properties, they are:   
+   as for the properties, they are:
+   name - name of the variable  
    seqId - each order gets a sequential integer seqId that helps us keep track of   
    the order the requests were received at.  
    isLastRequest - Only one entity's isLastRequest would be set to true in this model at any given time, 
@@ -25,7 +26,7 @@ The noSQL database used was Datasore. in order to make all data persistent the d
    the meaning of the properties is the same as in SettingHistory.  
 
 __the nitty gritty behind the scenes:__ 
-As entities are created in SettingHistory model as a result of set/unset, or moved from SettingHistory to PotentialRedos  
+As entities are created in SettingHistory model as a result of set/unset, or moved from SettingHistory to PotentialRedos
 and vice versa due to redo/undo commands, the isLastRequest property gets updated, acting as a sort of persistent pointer.  
 so when a new set/unset request arrives, the command is also saved in SettingHistory and gets to be the one with   
 isLastRequest = true.  
