@@ -23,7 +23,7 @@ The noSQL database used was Datasore. in order to make all data persistent the d
    is successful then the set/unset command would leave this model and return to the SettingHistory one.
    the meaning of the properties is the same as in SettingHistory.
 
-__the nitty gritty behind the scenes__
+__the nitty gritty behind the scenes:__ 
 As entities are created in SettingHistory model as a result of set/unset, or moved from SettingHistory to PotentialRedos
 and vice versa due to redo/undo commands, the isLastRequest property gets updated, acting as a sort of persistent pointer.
 so for example when we make a successful undo, then the log of the set command leaves the SettingHistory model,
