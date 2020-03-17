@@ -2,25 +2,38 @@ This database was implemented using **Python** and **Google App Engine**
 
 The HTTP methods in this project are all of type GET
 
-
 The noSQL database used was Datasore. in order to make all data persistent the database has four models:
 1. **Item(name,value)**- This model contains the variables in the db, specifically their name and value.
 2. **ValueOccurence(value,occurence)** - this model contains the values that have at least 1 occurence in the db.  
 3. **SettingHistory(seqId,name,value,priorValue,isLastRequest)** - This model represents the history logs of the 
    set/unset commands. We know whether a request is a set or an unset request by the value property, if value='None'
    then it is an unset command, otherwise it's a set command.
-   as for the properties, they are: seqId - each order gets a sequential integer seqId that helps us keep track of 
+   as for the properties, they are: 
+   seqId - each order gets a sequential integer seqId that helps us keep track of 
    the order the requests were received at.
-   priorValue is the value that an item had before this set/unset command.
-   Only one entity's isLastRequest would be set to true at any given time, it represents the most recent one.
+   isLastRequest - Only one entity's isLastRequest would be set to true in this model at any given time, 
+   it represents the most recent one.
    it's goal is to let us know the most recent set/unset command, so that we could easily know the seqId
    that should be given to the next set/unset request.
-   priorValue points to the last value the entity with this name has had, before this last set/unset request.
-   SeqId would help us keep these logs in order.
+   priorValue - points to the last value the entity with this name has had, before this last set/unset request.
+   SeqId - would help us keep these logs of set/unset commands in order.
 4. **PotentialRedos(seqId,name,value,isLastRequest)** -  This class entities would be set/unset commands 
    that were undone, they would leave the SettingHistory model and enter this one upon a successful undo. 
    When trying to redo, we would check to see whether this model has entities in it. and if a redo
-   is successful then the set/unset command would leave this model and return to the SttingHistory one.
+   is successful then the set/unset command would leave this model and return to the SettingHistory one.
+   the meaning of the properties is the same as in SettingHistory.
+
+__the nitty gritty behind the scenes__
+As entities are created in SettingHistory model as a result of set/unset, or moved from SettingHistory to PotentialRedos
+and vice versa due to redo/undo commands, the isLastRequest property gets updated, acting as a sort of persistent pointer.
+so for example when we make a successful undo, then the log of the set command leaves the SettingHistory model,
+and through seqId we change the value of the prior command's isLastRequest (the one with seqId-1) to true.
+the log of the set command that was removed from SettingHistory would enter PotentialRedos, and get to be the one
+with isLastRequest == True, since it is now the first command that would get redone if we get a redo request.
+similarly, on a successful redo command, the log of the command would leave PotentialRedos, letting the next command
+in line in PotentialRedos (we find it through seqId) become the one with a True value for isLastRequest.
+and the command that left PotentialRedos re-enters SettingHistory and gets to be the one with a True value for isLastRequest.
+of course other things change accordingly as well, like whether a variable is found in Item model, and occurences (in ValueOccurence).
 
 __Runtime:__
 The run time for all requests except /End is O(1) **on average**.
