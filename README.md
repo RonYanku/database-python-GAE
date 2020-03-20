@@ -2,6 +2,7 @@ This database was implemented using **Python** and **Google App Engine**
 
 The HTTP methods in this project are all of type GET.
 
+__Models__
 The noSQL database used was Datasore. in order to make all data persistent the database has four models:  
 1. **Item(name,value)**- This model contains the variables in the db, specifically their name and value.  
 2. **ValueOccurence(value,occurence)** - this model contains the values that have at least 1 occurence in the db.    
